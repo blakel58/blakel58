@@ -44,7 +44,7 @@ function Track({ bars, kind, finish, finishLabel }: { bars: Bar[]; kind: 'trad' 
 
 export function Process() {
   return (
-    <section className="section" id="process" aria-label="How we improve the construction process">
+    <section className="section" aria-label="How we improve the construction process">
       <div className="wrap">
         <Station sta="4+00" right="CMAR · Design-Build · Progressive DB">
           Our Process

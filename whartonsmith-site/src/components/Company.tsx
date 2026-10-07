@@ -176,7 +176,7 @@ export function Locations() {
 
 export function Careers() {
   return (
-    <section className="section" id="careers" aria-label="Careers">
+    <section className="section" aria-label="Careers">
       <div className="wrap">
         <Station sta="7+00" right="Now hiring">
           Careers
@@ -206,10 +206,11 @@ export function Careers() {
   )
 }
 
-export function Footer() {
+export function Footer({ cta = true }: { cta?: boolean }) {
   return (
     <>
-      <section className="cta" id="contact" aria-label="Contact">
+      {cta && (
+      <section className="cta" aria-label="Contact">
         <div className="wrap">
           <div>
             <Lines className="display" lines={['Ready to', 'build?']} />
@@ -225,6 +226,7 @@ export function Footer() {
           </div>
         </div>
       </section>
+      )}
       <footer className="footer">
         <div className="wrap">
           <div className="footer-top">
@@ -293,7 +295,7 @@ export function Footer() {
             <span>
               © {new Date().getFullYear()} {company.legalName} Equal Opportunity Employer.
             </span>
-            <a href="#top">Back to top ↑</a>
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</button>
           </div>
         </div>
       </footer>

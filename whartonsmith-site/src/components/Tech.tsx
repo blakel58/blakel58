@@ -100,7 +100,7 @@ function Viewer() {
 
 export function Technology() {
   return (
-    <section className="section tech" id="technology" aria-label="Technology">
+    <section className="section tech" aria-label="Technology">
       <div className="wrap">
         <Station sta="3+00" right="VDC · BIM · Reality capture">
           Technology

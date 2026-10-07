@@ -9,7 +9,7 @@ export function Hero() {
   const mediaY = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
 
   return (
-    <section className="hero" id="top" ref={ref} aria-label="Introduction">
+    <section className="hero" ref={ref} aria-label="Introduction">
       <motion.div className="hero-media" style={{ y: mediaY }}>
         <div className="shot">
           {hero.video ? (
@@ -65,7 +65,7 @@ export function Hero() {
             own crews since {company.founded}.
           </p>
           <div className="hero-ctas">
-            <a className="btn btn-yellow" href="#water">
+            <a className="btn btn-yellow" href="#projects">
               See our work <Arrow />
             </a>
             <a className="btn btn-ghost" href={links.contact}>

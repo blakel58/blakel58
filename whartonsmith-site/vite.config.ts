@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   resolve: {
-    alias: demo ? [{ find: /^\.\.\/data\/site$/, replacement: fileURLToPath(new URL('./src/data/site.demo.ts', import.meta.url)) }] : [],
+    alias: demo ? [{ find: /^(\.{1,2}\/)+data\/site$/, replacement: fileURLToPath(new URL('./src/data/site.demo.ts', import.meta.url)) }] : [],
   },
   build: { chunkSizeWarningLimit: 1600 },
 })

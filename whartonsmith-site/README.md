@@ -9,7 +9,11 @@ npm run build                                # production build (real branding)
 VITE_DEMO=1 npx vite build --base ./         # shareable preview, placeholder branding
 ```
 
-## Page structure
+## Pages
+
+The site is split into pages with a small hash router (`src/router.tsx`, `src/pages.tsx`): Home, Water, Commercial, Projects, Technology, Our Process, About, Careers and Contact. Routes are plain tokens such as `#water` and `#projects`.
+
+## Sections
 
 | Section | What it shows |
 | --- | --- |
@@ -32,3 +36,5 @@ Every image slot is an `Img` in `src/data/site.ts`: `{ src, shot, real }`. Today
 - Content lives in `src/data/site.ts`. `site.demo.ts` is its placeholder twin for previews, so keep the two files' exports in sync.
 - Confirm the facts, the technology list (marked CONFIRM) and the safety copy.
 - Point `links.*` at the real Contact, Careers and Bid pages.
+- The contact form is a placeholder: wire it to a real form handler.
+- Colors are placeholders. Swap the tokens at the top of `src/styles.css` (marked BRAND) for the company's real palette.

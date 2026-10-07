@@ -62,29 +62,36 @@ export function Divisions() {
   )
 }
 
-function Cards({ projects }: { projects: { title: string; location: string; specs: string[]; image: Img }[] }) {
+type Project = { title: string; location: string; specs: string[]; image: Img }
+
+export function Card({ p, i = 0 }: { p: Project; i?: number }) {
+  return (
+    <motion.article
+      className="card"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -8% 0px' }}
+      transition={{ duration: 0.8, ease, delay: i * 0.1 }}
+    >
+      <Shot image={p.image} alt={p.title} />
+      <div className="card-body">
+        <span className="card-loc">{p.location}</span>
+        <h4>{p.title}</h4>
+        <div className="card-specs">
+          {p.specs.map((s) => (
+            <span key={s}>{s}</span>
+          ))}
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+export function Cards({ projects }: { projects: Project[] }) {
   return (
     <div className="cards">
       {projects.map((p, i) => (
-        <motion.article
-          key={p.title}
-          className="card"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 0.8, ease, delay: i * 0.1 }}
-        >
-          <Shot image={p.image} alt={p.title} />
-          <div className="card-body">
-            <span className="card-loc">{p.location}</span>
-            <h4>{p.title}</h4>
-            <div className="card-specs">
-              {p.specs.map((s) => (
-                <span key={s}>{s}</span>
-              ))}
-            </div>
-          </div>
-        </motion.article>
+        <Card key={p.title} p={p} i={i} />
       ))}
     </div>
   )
@@ -92,7 +99,7 @@ function Cards({ projects }: { projects: { title: string; location: string; spec
 
 export function Water() {
   return (
-    <section className="section water-sec" id="water" aria-label="Water division">
+    <section className="section water-sec" aria-label="Water division">
       <div className="wrap">
         <Station sta="1+00" right="Water & Wastewater">
           Water Division
@@ -134,7 +141,7 @@ export function Water() {
         <div className="projects-row">
           <div className="projects-head">
             <h3>Water projects</h3>
-            <a className="label" href="#water">
+            <a className="label" href="#projects">
               All water work →
             </a>
           </div>
@@ -147,7 +154,7 @@ export function Water() {
 
 export function Commercial() {
   return (
-    <section className="section dark grain" id="commercial" aria-label="Commercial division">
+    <section className="section dark grain" aria-label="Commercial division">
       <div className="wrap">
         <Station sta="2+00" right="Municipal · Education · Venues">
           Commercial Division
@@ -187,7 +194,7 @@ export function Commercial() {
         <div className="projects-row">
           <div className="projects-head">
             <h3>Commercial projects</h3>
-            <a className="label" href="#commercial" style={{ color: 'var(--yellow)' }}>
+            <a className="label" href="#projects" style={{ color: 'var(--yellow)' }}>
               All commercial work →
             </a>
           </div>

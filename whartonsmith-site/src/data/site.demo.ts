@@ -23,8 +23,10 @@ export const links = {
 export const nav = [
   { label: 'Water', href: '#water' },
   { label: 'Commercial', href: '#commercial' },
+  { label: 'Projects', href: '#projects' },
   { label: 'Technology', href: '#technology' },
   { label: 'Our Process', href: '#process' },
+  { label: 'About', href: '#about' },
   { label: 'Careers', href: '#careers' },
 ]
 

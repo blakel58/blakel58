@@ -15,7 +15,7 @@ export function Logo() {
   )
 }
 
-export function Nav() {
+export function Nav({ route }: { route: string }) {
   const { scrollY } = useScroll()
   const [solid, setSolid] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -27,6 +27,8 @@ export function Nav() {
     setHidden(y > prev && y > 300)
   })
 
+  useEffect(() => setOpen(false), [route])
+
   useEffect(() => {
     document.documentElement.style.overflow = open ? 'hidden' : ''
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
@@ -37,14 +39,16 @@ export function Nav() {
   return (
     <>
       <header className={`nav ${solid || open ? 'is-solid' : ''} ${hidden && !open ? 'is-hidden' : ''}`}>
-        <a href="#top" aria-label={`${company.name} home`}>
+        <a href="#home" aria-label={`${company.name} home`}>
           <Logo />
         </a>
         <nav aria-label="Primary">
           <ul className="nav-links">
             {nav.map((n) => (
               <li key={n.href}>
-                <a href={n.href}>{n.label}</a>
+                <a href={n.href} className={n.href === `#${route}` ? 'is-active' : ''} aria-current={n.href === `#${route}` ? 'page' : undefined}>
+                  {n.label}
+                </a>
               </li>
             ))}
           </ul>
