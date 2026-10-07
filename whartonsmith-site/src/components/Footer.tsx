@@ -1,26 +1,13 @@
-import { motion } from 'motion/react'
-import { company, links, markets, nav } from '../data/site'
-import { Button, RevealLines, ease } from './ui'
-
-const WORD = ['W', 'H', 'A', 'R', 'T', 'O', 'N', '–', 'S', 'M', 'I', 'T', 'H']
+import { company, links, markets, services } from '../data/site'
+import { Logo } from './ui'
 
 export function Footer() {
   return (
-    <footer className="footer section-dark" id="contact">
-      <div className="wrap">
-        <div className="footer-cta">
+    <footer className="footer" id="contact">
+      <div className="container">
+        <div className="footer-top">
           <div>
-            <div className="mono eyebrow" style={{ marginBottom: 20 }}>
-              Start a project
-            </div>
-            <RevealLines className="display" lines={['Let’s build', 'something that lasts.']} />
-          </div>
-          <Button href={links.contact}>Get in touch</Button>
-        </div>
-
-        <div className="footer-cols">
-          <div>
-            <h4 className="mono">Headquarters</h4>
+            <Logo />
             <address>
               {company.legalName}
               <br />
@@ -28,19 +15,10 @@ export function Footer() {
               <br />
               {company.hq.city}
             </address>
+            <p className="footer-vision">Our vision: {company.vision.replace(/^To be/, 'to be')}</p>
           </div>
           <div>
-            <h4 className="mono">Company</h4>
-            <ul>
-              {nav.map((n) => (
-                <li key={n.href}>
-                  <a href={n.href}>{n.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="mono">Markets</h4>
+            <h4>Markets</h4>
             <ul>
               {markets.map((m) => (
                 <li key={m.key}>
@@ -50,51 +28,75 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="mono">Connect</h4>
+            <h4>Services</h4>
+            <ul>
+              {services.map((s) => (
+                <li key={s.title}>
+                  <a href="#services">{s.short}</a>
+                </li>
+              ))}
+              <li>
+                <a href="#self-perform">Self-Perform</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4>Company</h4>
             <ul>
               <li>
-                <a href={company.linkedin} target="_blank" rel="noreferrer">
-                  LinkedIn ↗
-                </a>
+                <a href="#projects">Projects</a>
+              </li>
+              <li>
+                <a href="#safety">Safety</a>
+              </li>
+              <li>
+                <a href="#locations">Locations</a>
+              </li>
+              <li>
+                <a href="#news">News</a>
               </li>
               <li>
                 <a href={links.careers}>Careers</a>
               </li>
+            </ul>
+          </div>
+          <div>
+            <h4>Partners</h4>
+            <ul>
               <li>
-                <a href={links.contact}>Contact</a>
+                <a href={links.bids}>Bid Opportunities</a>
+              </li>
+              <li>
+                <a href={links.prequal}>Subcontractor Prequalification</a>
+              </li>
+              <li>
+                <a href={links.contact}>Contact Us</a>
+              </li>
+              <li>
+                <a href={company.linkedin} target="_blank" rel="noreferrer">
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a href={company.facebook} target="_blank" rel="noreferrer">
+                  Facebook
+                </a>
               </li>
             </ul>
           </div>
         </div>
-      </div>
-
-      <motion.div
-        className="footer-word"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ staggerChildren: 0.04 }}
-        aria-hidden="true"
-      >
-        {WORD.map((ch, i) => (
-          <span key={i}>
-            <motion.span
-              className={ch === '–' ? 'dash' : undefined}
-              variants={{ hidden: { y: '100%' }, show: { y: '0%', transition: { duration: 1, ease } } }}
-            >
-              {ch}
-            </motion.span>
-          </span>
-        ))}
-      </motion.div>
-
-      <div className="wrap">
-        <div className="footer-base mono">
+        <div className="footer-bottom">
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © {new Date().getFullYear()} {company.legalName} All rights reserved. Equal Opportunity Employer.
           </span>
-          <span>Est. {company.founded} · Sanford, Florida</span>
-          <a href="#top">Back to top ↑</a>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <li>
+              <a href="#">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="#top">Back to top ↑</a>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

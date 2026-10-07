@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } from 'motion/react'
-import { links, nav } from '../data/site'
-import { Arrow, Button, LogoMark, ease } from './ui'
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react'
+import { company, links, nav } from '../data/site'
+import { Arrow, Button, Logo, ease } from './ui'
 
 export function Nav() {
-  const { scrollY, scrollYProgress } = useScroll()
-  const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 })
+  const { scrollY } = useScroll()
+  const [solid, setSolid] = useState(false)
   const [hidden, setHidden] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  const [hovered, setHovered] = useState<string | null>(null)
 
   useMotionValueEvent(scrollY, 'change', (y) => {
     const prev = scrollY.getPrevious() ?? 0
-    setScrolled(y > 40)
-    setHidden(y > prev && y > 400 && !open)
+    setSolid(y > 24)
+    setHidden(y > prev && y > 600)
   })
 
   useEffect(() => {
@@ -26,87 +24,85 @@ export function Nav() {
 
   return (
     <>
-      <motion.div className="progress" style={{ scaleX: progress }} />
-      <motion.header
-        className={`nav ${scrolled || open ? 'is-scrolled' : ''}`}
-        animate={{ y: hidden ? '-100%' : '0%' }}
-        transition={{ duration: 0.45, ease }}
+      <header
+        className={`header ${solid || open ? 'is-solid' : ''}`}
+        style={{ transform: hidden && !open ? 'translateY(-100%)' : undefined }}
       >
-        <a href="#top" className="logo" aria-label="Wharton-Smith home">
-          <LogoMark />
-          <span>
-            Wharton<span className="dash">–</span>Smith
-          </span>
-        </a>
-
-        <nav aria-label="Primary">
-          <ul className="nav-links" onPointerLeave={() => setHovered(null)}>
-            {nav.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} onPointerEnter={() => setHovered(item.href)}>
-                  {hovered === item.href && (
-                    <motion.span className="nav-pill" layoutId="nav-pill" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />
-                  )}
-                  {item.label}
+        <div className="utility">
+          <div className="container">
+            <span>Building the Southeast since {company.founded}</span>
+            <ul>
+              <li>
+                <a href={links.bids}>Bid Opportunities</a>
+              </li>
+              <li>
+                <a href={links.prequal}>Subcontractor Prequalification</a>
+              </li>
+              <li>
+                <a href={company.linkedin} target="_blank" rel="noreferrer">
+                  LinkedIn
                 </a>
               </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="nav-right">
-          <Button href={links.contact}>Start a project</Button>
-          <button
-            className="menu-btn"
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            onClick={() => setOpen((o) => !o)}
-          >
-            <span />
-            <span />
-          </button>
+            </ul>
+          </div>
         </div>
-      </motion.header>
+        <div className="nav">
+          <div className="container">
+            <a href="#top" aria-label="Wharton-Smith home">
+              <Logo />
+            </a>
+            <nav aria-label="Primary">
+              <ul className="nav-links">
+                {nav.map((item) => (
+                  <li key={item.href}>
+                    <a href={item.href}>{item.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Button href={links.contact}>Contact Us</Button>
+              <button
+                className="menu-btn"
+                aria-label={open ? 'Close menu' : 'Open menu'}
+                aria-expanded={open}
+                aria-controls="mobile-menu"
+                onClick={() => setOpen((o) => !o)}
+              >
+                <span />
+                <span />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <AnimatePresence>
         {open && (
           <motion.div
             id="mobile-menu"
             className="mobile-menu"
-            initial={{ clipPath: 'inset(0 0 100% 0)' }}
-            animate={{ clipPath: 'inset(0 0 0% 0)' }}
-            exit={{ clipPath: 'inset(0 0 100% 0)' }}
-            transition={{ duration: 0.7, ease }}
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35, ease }}
           >
             <ul>
-              {[...nav, { label: 'Contact', href: links.contact }].map((item, i) => (
+              {nav.map((item) => (
                 <li key={item.href}>
-                  <motion.a
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 0.8, ease, delay: 0.15 + i * 0.06 }}
-                  >
+                  <a href={item.href} onClick={() => setOpen(false)}>
                     {item.label}
-                    <span className="mono" style={{ color: 'var(--accent)' }}>
-                      0{i + 1}
-                    </span>
-                  </motion.a>
+                    <Arrow />
+                  </a>
                 </li>
               ))}
             </ul>
-            <motion.a
-              href={links.careers}
-              className="mono"
-              onClick={() => setOpen(false)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { delay: 0.6 } }}
-              style={{ display: 'inline-flex', gap: 10, alignItems: 'center', color: 'var(--accent)' }}
-            >
-              We’re hiring <Arrow />
-            </motion.a>
+            <a href={links.contact} className="btn btn-primary" onClick={() => setOpen(false)}>
+              Contact Us
+            </a>
+            <a href={links.bids} className="btn btn-outline-dark" onClick={() => setOpen(false)}>
+              Bid Opportunities
+            </a>
           </motion.div>
         )}
       </AnimatePresence>

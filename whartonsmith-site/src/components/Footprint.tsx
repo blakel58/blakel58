@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
-import { offices } from '../data/site'
-import { RevealLines, ease } from './ui'
+import { offices, regions } from '../data/site'
+import { Reveal, ease } from './ui'
 
 // Simple equirectangular projection over the Gulf/South Atlantic region.
 const W = 1000
@@ -36,130 +36,135 @@ const hqPt = project(hq.lon, hq.lat)
 export function Footprint() {
   const [active, setActive] = useState<string | null>(null)
   const pts = offices.map((o) => ({ ...o, ...project(o.lon, o.lat) }))
+  const officeName = (label: string) => label.replace(/ \(HQ\)|, [A-Z]{2}$/g, '')
 
   return (
-    <section className="footprint section-dark" id="footprint" aria-label="Office locations">
-      <div className="wrap footprint-grid">
-        <div className="footprint-copy">
-          <div className="mono eyebrow">Our footprint</div>
-          <RevealLines className="display" lines={['Rooted in Sanford.', 'Built across', 'the Southeast.']} />
-          <p>
-            Eleven offices in four states, each staffed by people who live in the communities they build for, backed by
-            the resources of our Sanford headquarters.
+    <section className="section section-alt locations" id="locations" aria-labelledby="locations-title">
+      <div className="container locations-grid">
+        <Reveal>
+          <div className="eyebrow">Locations</div>
+          <h2 id="locations-title">Local teams. Regional strength.</h2>
+          <p className="locations-lede">
+            Headquartered in Sanford, Florida, with regional offices across Florida, Texas, Louisiana and North
+            Carolina. Our people live in the communities they build.
           </p>
-          <ul className="office-list" onPointerLeave={() => setActive(null)}>
-            {offices.map((o) => (
-              <li key={o.name}>
-                <button
-                  className={active === o.name ? 'is-active' : ''}
-                  onPointerEnter={() => setActive(o.name)}
-                  onFocus={() => setActive(o.name)}
-                  onBlur={() => setActive(null)}
-                >
-                  {o.name}
-                  <span className="mono">{o.hq ? 'HQ' : o.state}</span>
-                </button>
+          <ul className="region-list" onPointerLeave={() => setActive(null)}>
+            {regions.map((r) => (
+              <li key={r.name}>
+                <strong>{r.name}</strong>
+                <span>
+                  {r.offices.map((o, k) => (
+                    <span key={o}>
+                      {k > 0 && ' · '}
+                      <button
+                        className={active === officeName(o) ? 'is-active' : ''}
+                        onPointerEnter={() => setActive(officeName(o))}
+                        onFocus={() => setActive(officeName(o))}
+                        onBlur={() => setActive(null)}
+                      >
+                        {o}
+                      </button>
+                    </span>
+                  ))}
+                </span>
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
 
-        <motion.div
-          className="map"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.35 }}
-          aria-hidden="true"
-        >
-          <svg viewBox={`0 0 ${W} ${H}`}>
-            <defs>
-              <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
-                <circle cx="7" cy="7" r="1.6" fill="rgba(239,235,227,0.22)" />
-              </pattern>
-              <clipPath id="land">
-                <path d={landPath} />
-              </clipPath>
-            </defs>
-
-            <motion.rect
-              width={W}
-              height={H}
-              fill="url(#dots)"
-              clipPath="url(#land)"
-              variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 1.2 } } }}
-            />
-            <motion.path
-              d={coastPath}
-              fill="none"
-              stroke="rgba(239,235,227,0.4)"
-              strokeWidth={1.2}
-              variants={{
-                hidden: { pathLength: 0 },
-                show: { pathLength: 1, transition: { duration: 2.4, ease } },
-              }}
-            />
-
-            {pts
-              .filter((p) => !p.hq)
-              .map((p, i) => {
-                const mx = (hqPt.x + p.x) / 2
-                const my = (hqPt.y + p.y) / 2 - Math.hypot(p.x - hqPt.x, p.y - hqPt.y) * 0.35
+        <Reveal delay={0.1}>
+          <motion.div className="map" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.35 }} aria-hidden="true">
+            <svg viewBox={`0 0 ${W} ${H}`}>
+              <defs>
+                <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+                  <circle cx="7" cy="7" r="1.6" fill="rgba(255,255,255,0.2)" />
+                </pattern>
+                <clipPath id="land">
+                  <path d={landPath} />
+                </clipPath>
+              </defs>
+              <motion.rect
+                width={W}
+                height={H}
+                fill="url(#dots)"
+                clipPath="url(#land)"
+                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 1 } } }}
+              />
+              <motion.path
+                d={coastPath}
+                fill="none"
+                stroke="rgba(255,255,255,0.35)"
+                strokeWidth={1.2}
+                variants={{ hidden: { pathLength: 0 }, show: { pathLength: 1, transition: { duration: 2, ease } } }}
+              />
+              {pts
+                .filter((p) => !p.hq)
+                .map((p, i) => {
+                  const mx = (hqPt.x + p.x) / 2
+                  const my = (hqPt.y + p.y) / 2 - Math.hypot(p.x - hqPt.x, p.y - hqPt.y) * 0.3
+                  const on = active === p.name
+                  return (
+                    <motion.path
+                      key={p.name}
+                      d={`M${hqPt.x} ${hqPt.y} Q${mx} ${my} ${p.x} ${p.y}`}
+                      fill="none"
+                      stroke={on ? 'var(--accent)' : 'rgba(242,169,0,0.45)'}
+                      strokeWidth={on ? 2.4 : 1.2}
+                      variants={{
+                        hidden: { pathLength: 0, opacity: 0 },
+                        show: { pathLength: 1, opacity: 1, transition: { duration: 1.2, ease, delay: 0.6 + i * 0.07 } },
+                      }}
+                    />
+                  )
+                })}
+              {pts.map((p, i) => {
                 const on = active === p.name
+                const label = ALWAYS_LABEL.has(p.name) || on
+                const right = p.name === 'Charlotte' || p.hq
                 return (
-                  <motion.path
+                  <motion.g
                     key={p.name}
-                    d={`M${hqPt.x} ${hqPt.y} Q${mx} ${my} ${p.x} ${p.y}`}
-                    fill="none"
-                    stroke={on ? 'var(--accent)' : 'rgba(255,91,31,0.5)'}
-                    strokeWidth={on ? 2 : 1.2}
-                    strokeDasharray={on ? undefined : '4 5'}
                     variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      show: { pathLength: 1, opacity: 1, transition: { duration: 1.4, ease, delay: 0.8 + i * 0.08 } },
+                      hidden: { opacity: 0 },
+                      show: { opacity: 1, transition: { duration: 0.4, delay: p.hq ? 0.3 : 1 + i * 0.07 } },
                     }}
-                  />
-                )
-              })}
-
-            {pts.map((p, i) => {
-              const on = active === p.name
-              const label = ALWAYS_LABEL.has(p.name) || on
-              return (
-                <motion.g
-                  key={p.name}
-                  variants={{
-                    hidden: { opacity: 0, scale: 0 },
-                    show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease, delay: p.hq ? 0.5 : 1.4 + i * 0.08 } },
-                  }}
-                >
-                  {(p.hq || on) && (
-                    <motion.circle
+                  >
+                    {(p.hq || on) && (
+                      <motion.circle
+                        cx={p.x}
+                        cy={p.y}
+                        fill="none"
+                        stroke="var(--accent)"
+                        initial={{ r: 6, opacity: 0.9 }}
+                        animate={{ r: 26, opacity: 0 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                      />
+                    )}
+                    <circle
                       cx={p.x}
                       cy={p.y}
-                      fill="none"
-                      stroke="var(--accent)"
-                      initial={{ r: 6, opacity: 0.9 }}
-                      animate={{ r: 30, opacity: 0 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                      r={p.hq ? 9 : on ? 7 : 5}
+                      fill={p.hq || on ? 'var(--accent)' : '#fff'}
+                      stroke="var(--navy-900)"
+                      strokeWidth={2}
                     />
-                  )}
-                  <circle cx={p.x} cy={p.y} r={p.hq ? 9 : on ? 7 : 5} fill={p.hq || on ? 'var(--accent)' : 'var(--bone)'} />
-                  {label && (
-                    <text
-                      x={p.x + (p.name === 'Charlotte' || p.hq ? 16 : 0)}
-                      y={p.y + (p.name === 'Charlotte' || p.hq ? 5 : -16)}
-                      textAnchor={p.name === 'Charlotte' || p.hq ? 'start' : 'middle'}
-                      className="map-label"
-                      style={on || p.hq ? { fill: 'var(--bone)' } : undefined}
-                    >
-                      {p.hq ? 'Sanford HQ' : p.name}
-                    </text>
-                  )}
-                </motion.g>
-              )
-            })}
-          </svg>
-        </motion.div>
+                    {label && (
+                      <text
+                        x={p.x + (right ? 16 : 0)}
+                        y={p.y + (right ? 5 : -16)}
+                        textAnchor={right ? 'start' : 'middle'}
+                        className="map-label"
+                        style={on || p.hq ? { fill: '#fff' } : undefined}
+                      >
+                        {p.hq ? 'Sanford HQ' : p.name}
+                      </text>
+                    )}
+                  </motion.g>
+                )
+              })}
+            </svg>
+          </motion.div>
+        </Reveal>
       </div>
     </section>
   )

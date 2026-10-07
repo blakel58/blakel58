@@ -1,103 +1,240 @@
-// Company facts and copy, gathered from public sources (Oct 2026).
-// Anything marked PLACEHOLDER should be replaced with Wharton-Smith's own
-// content before launch.
+// Company facts, projects and copy, gathered from whartonsmith.com search
+// listings and public news coverage (Oct 2026). Verify with Wharton-Smith
+// before launch. Items marked PLACEHOLDER need real content.
 
 export const company = {
   name: 'Wharton-Smith',
   legalName: 'Wharton-Smith, Inc.',
   founded: 1984,
   founders: 'Bill Wharton and George Smith',
-  vision: 'The construction group of choice.',
-  hq: {
-    street: '750 Monroe Road',
-    city: 'Sanford, FL 32771',
-    coords: '28.8029° N, 81.2695° W',
-  },
+  vision: 'To be the construction group of choice.',
+  hq: { street: '750 Monroe Road', city: 'Sanford, FL 32771' },
   linkedin: 'https://www.linkedin.com/company/wharton-smith-inc-',
+  facebook: 'https://www.facebook.com/whartonsmithinc/',
 }
 
-// PLACEHOLDER hrefs: point these at the real pages.
+// PLACEHOLDER hrefs: point these at the real pages / portals.
 export const links = {
   contact: '#contact',
   careers: '#careers',
   projects: '#projects',
+  bids: '#contact',
+  prequal: '#contact',
+}
+
+// Drop real photography into /public/images and set the paths here.
+// When a path is empty, a technical-drawing panel is shown instead.
+export const photos = {
+  hero: '', // e.g. '/images/hero.jpg' (wide jobsite / aerial of a plant)
+  selfPerform: '', // e.g. '/images/self-perform.jpg' (crew placing concrete)
+  careers: '', // e.g. '/images/careers.jpg' (field team on site)
 }
 
 export const nav = [
   { label: 'Markets', href: '#markets' },
   { label: 'Services', href: '#services' },
   { label: 'Projects', href: '#projects' },
-  { label: 'Footprint', href: '#footprint' },
+  { label: 'Self-Perform', href: '#self-perform' },
+  { label: 'Safety', href: '#safety' },
+  { label: 'Locations', href: '#locations' },
   { label: 'Careers', href: '#careers' },
 ]
 
-export type MarketKey = 'water' | 'municipal' | 'education' | 'hospitality' | 'community'
+export const kpis: { value: number; label: string; from?: number; prefix?: string; suffix?: string }[] = [
+  { value: 1984, label: 'Founded in Sanford, FL', from: 1950 },
+  { value: 11, label: 'Offices in FL, TX, LA & NC' },
+  { value: 400, label: 'Builders, engineers & craft', prefix: '~' },
+  { value: 120, label: 'Self-perform craftsmen', suffix: '+' },
+]
 
-export const markets: {
-  key: MarketKey
-  title: string
-  short: string
-  body: string
-  tags: string[]
-}[] = [
+export const credentials = [
+  'ENR Top 400 Contractors',
+  'ENR Top 200 Environmental Firms',
+  'ENR Southeast Top Contractors',
+  'DBIA Florida Design-Build Project of the Year 2026',
+  'Top Workplaces',
+]
+
+export type MarketKey = 'water' | 'municipal' | 'education' | 'hospitality' | 'industrial' | 'community'
+
+export const markets: { key: MarketKey; title: string; body: string; examples: string }[] = [
   {
     key: 'water',
     title: 'Water & Wastewater',
-    short: 'Water',
-    body: 'Treatment plants, pump stations, reuse and conveyance. Our founding market since 1984, and one where ENR Southeast has ranked us a top contractor year after year.',
-    tags: ['Water treatment', 'Wastewater', 'Reclaimed water', 'Pump stations', 'Membranes'],
+    body: 'Water treatment, water reclamation, reuse, pump stations and conveyance. Our founding market since 1984, and the core of what we do.',
+    examples: 'WTPs · WRFs · Reuse · Pump stations',
   },
   {
     key: 'municipal',
-    title: 'Municipal',
-    short: 'Municipal',
-    body: 'Public safety, civic and operations facilities, built to public budgets, public schedules and the scrutiny that comes with them.',
-    tags: ['Public safety', 'Civic buildings', 'Operations centers', 'Parks & recreation'],
+    title: 'Municipal & Justice',
+    body: 'Justice centers, public safety, fire and police stations, and civic buildings, built to public budgets and schedules.',
+    examples: 'Justice · Public safety · Parking',
   },
   {
     key: 'education',
     title: 'Education',
-    short: 'Education',
-    body: 'K-12 and higher-ed facilities planned around the school calendar, with occupied campuses and student safety coming first.',
-    tags: ['K-12', 'Higher education', 'Renovations', 'Occupied campuses'],
+    body: 'K-12 and higher-education facilities, from new prototype high schools to renovations on occupied campuses.',
+    examples: 'K-12 · Higher ed · Renovations',
   },
   {
     key: 'hospitality',
     title: 'Entertainment & Hospitality',
-    short: 'Hospitality',
-    body: 'Guest-facing work in Central Florida, one of the most demanding entertainment markets in the world, where opening day doesn’t move.',
-    tags: ['Attractions', 'Resorts', 'Venues', 'Back-of-house'],
+    body: 'Themed attractions, sports and recreation venues, and hospitality projects where opening day is fixed.',
+    examples: 'Attractions · Sports · Resorts',
+  },
+  {
+    key: 'industrial',
+    title: 'Industrial',
+    body: 'Heavy civil, structural, mechanical and process work for industrial owners, backed by our self-perform crews.',
+    examples: 'Process · Heavy civil · Mechanical',
   },
   {
     key: 'community',
-    title: 'Community',
-    short: 'Community',
-    body: 'Community developments and the projects that hold neighborhoods together, built by people who live in them.',
-    tags: ['Community developments', 'Affordable housing', 'Commercial'],
+    title: 'Community & Commercial',
+    body: 'Community centers, parks and recreation, mixed-use and commercial buildings for the neighborhoods we live in.',
+    examples: 'Community centers · Parks · Mixed-use',
   },
 ]
 
 export const services = [
   {
-    title: 'Preconstruction',
-    body: 'Estimating, constructability reviews, scheduling and value engineering before the first shovel. We look for the problems while they’re still cheap to fix.',
-  },
-  {
     title: 'Construction Management at Risk',
-    body: 'We join early, commit to a guaranteed maximum price and bring owner, designer and builder together around one budget and one schedule.',
+    short: 'CMAR',
+    body: 'We join during design, commit to a guaranteed maximum price and manage cost, schedule and quality on the owner’s behalf through closeout.',
   },
   {
     title: 'Design-Build',
-    body: 'One contract and one team responsible from concept through commissioning. Fewer handoffs, faster decisions, clear accountability.',
+    short: 'Design-Build',
+    body: 'One contract and one accountable team from concept through commissioning. Faster decisions, fewer handoffs and a single point of responsibility.',
   },
   {
-    title: 'Progressive & Collaborative Delivery',
-    body: 'As a member of the Water Collaborative Delivery Association, we help owners use progressive design-build and CMAR to deliver complex water infrastructure with full transparency.',
+    title: 'Progressive Design-Build & EPC',
+    short: 'Progressive DB / EPC',
+    body: 'For complex water infrastructure we engineer, procure and construct as one team. As a member of the Water Collaborative Delivery Association, we bring open-book collaboration from day one.',
   },
   {
     title: 'General Contracting',
-    body: 'Traditional design-bid-build, carried out with the same people, safety culture and standards we bring to every other job.',
+    short: 'General Contracting',
+    body: 'Competitive hard-bid delivery with the same people, safety program and quality standards we bring to negotiated work.',
   },
+  {
+    title: 'Preconstruction',
+    short: 'Preconstruction',
+    body: 'Estimating, constructability and phasing reviews, scheduling and value engineering, so problems get solved on paper instead of in the field.',
+  },
+]
+
+export const selfPerform = [
+  'Cast-in-place concrete',
+  'Site work & earthwork',
+  'Underground utilities',
+  'Process piping',
+  'Mechanical equipment installation',
+  'Masonry',
+]
+
+// Water / wastewater process stages, used by the process diagram.
+export const processStages = [
+  { title: 'Headworks', body: 'Screening, grit removal and odor control at the front of the plant.' },
+  { title: 'Biological treatment', body: 'Activated sludge and BNR aeration basins with process air blowers.' },
+  { title: 'Clarification', body: 'Secondary clarifiers and splitter boxes that separate solids.' },
+  { title: 'Filtration', body: 'Tertiary filters and membrane systems for high-level treatment.' },
+  { title: 'Disinfection', body: 'Chlorine contact tanks and UV systems before discharge or reuse.' },
+  { title: 'Storage & reuse', body: 'Ground storage tanks, pump stations and reclaimed water distribution.' },
+]
+
+export type Project = {
+  title: string
+  market: MarketKey
+  drawing: 'water' | 'civic' | 'school'
+  location: string
+  owner?: string
+  specs: { label: string; value: string }[]
+  delivery?: string
+  completed?: string
+  image?: string // e.g. '/images/projects/hamlin.jpg'
+}
+
+export const projects: Project[] = [
+  {
+    title: 'Hamlin Water Reclamation Facility',
+    market: 'water',
+    drawing: 'water',
+    location: 'Winter Garden, FL',
+    owner: 'Orange County Utilities',
+    specs: [
+      { label: 'Capacity', value: '5.0 MGD (15 MGD build-out)' },
+      { label: 'Construction value', value: '$110.6M' },
+    ],
+    delivery: 'General Contractor',
+    completed: '2023',
+  },
+  {
+    title: 'Seminole County Justice Center Annex & Parking Garage',
+    market: 'municipal',
+    drawing: 'civic',
+    location: 'Sanford, FL',
+    owner: 'Seminole County',
+    specs: [
+      { label: 'Annex', value: '105,000 SF' },
+      { label: 'Garage', value: '5 levels, 150,000 SF' },
+    ],
+    delivery: 'Design-Build',
+    completed: '2023',
+  },
+  {
+    title: 'Northwest Regional Water Reclamation Facility Expansion',
+    market: 'water',
+    drawing: 'water',
+    location: 'Hillsborough County, FL',
+    owner: 'Hillsborough County',
+    specs: [{ label: 'Capacity', value: '10 MGD → 30 MGD' }],
+  },
+  {
+    title: 'Villages Charter High School, South Campus',
+    market: 'education',
+    drawing: 'school',
+    location: 'The Villages, FL',
+    specs: [{ label: 'Size', value: '450,000 SF campus' }],
+  },
+  {
+    title: 'Davenport High School',
+    market: 'education',
+    drawing: 'school',
+    location: 'Davenport, FL',
+    specs: [{ label: 'Size', value: '345,000 SF prototype' }],
+  },
+  {
+    title: 'Catawba River WTP Raw Water Reservoir Expansion',
+    market: 'water',
+    drawing: 'water',
+    location: 'Lancaster County, SC',
+    specs: [{ label: 'Scope', value: 'Raw water reservoir expansion' }],
+  },
+  {
+    title: 'West Harrison Middle School',
+    market: 'education',
+    drawing: 'school',
+    location: 'Gulfport, MS',
+    specs: [{ label: 'Construction value', value: '$26M' }],
+  },
+  {
+    title: 'Holy Trinity Middle School',
+    market: 'education',
+    drawing: 'school',
+    location: 'Charlotte, NC',
+    specs: [{ label: 'Scope', value: 'Renovation & improvements' }],
+    delivery: 'CMAR',
+  },
+]
+
+export const regions: { name: string; offices: string[] }[] = [
+  { name: 'Central Florida', offices: ['Sanford (HQ)', 'Space Coast'] },
+  { name: 'North Florida', offices: ['Jacksonville'] },
+  { name: 'Southwest Florida', offices: ['Tampa', 'North Port', 'Fort Myers'] },
+  { name: 'Southeast Florida', offices: ['Jupiter'] },
+  { name: 'Gulf Coast', offices: ['Pensacola', 'Baton Rouge, LA', 'Houston, TX'] },
+  { name: 'Carolinas', offices: ['Charlotte, NC'] },
 ]
 
 export const offices: { name: string; state: string; lat: number; lon: number; hq?: boolean }[] = [
@@ -114,28 +251,53 @@ export const offices: { name: string; state: string; lat: number; lon: number; h
   { name: 'Charlotte', state: 'NC', lat: 35.23, lon: -80.84 },
 ]
 
-// PLACEHOLDER portfolio: generic, representative entries so the layout can
-// be reviewed. Swap in real project names, photos (`image`) and details.
-export const projects: {
-  title: string
-  market: MarketKey
-  location: string
-  delivery: string
-  image?: string
-}[] = [
-  { title: 'Water Reclamation Facility Expansion', market: 'water', location: 'Central Florida', delivery: 'Progressive Design-Build' },
-  { title: 'Surface Water Treatment Plant', market: 'water', location: 'North Carolina', delivery: 'CMAR' },
-  { title: 'Public Safety Headquarters', market: 'municipal', location: 'Tampa Bay', delivery: 'CMAR' },
-  { title: 'High School Replacement Campus', market: 'education', location: 'Space Coast', delivery: 'CMAR' },
-  { title: 'Resort Back-of-House Renovation', market: 'hospitality', location: 'Orlando', delivery: 'General Contracting' },
-  { title: 'Regional Pump Station & Force Main', market: 'water', location: 'Gulf Coast, TX', delivery: 'Design-Build' },
-  { title: 'University Research Building', market: 'education', location: 'Southwest Florida', delivery: 'Design-Build' },
-  { title: 'Legacy Point', market: 'community', location: 'Seminole County', delivery: 'Community partnership' },
+// PLACEHOLDER: confirm wording with the safety department; add EMR / TRIR
+// figures here if Wharton-Smith publishes them.
+export const safety = [
+  {
+    title: 'Plan every task',
+    body: 'Hazards are identified and controlled before work starts, at every level from the project plan to each crew’s daily pre-task briefing.',
+  },
+  {
+    title: 'Everyone can stop work',
+    body: 'Every person on our sites, whether employee, subcontractor or visitor, has the authority and the obligation to stop unsafe work.',
+  },
+  {
+    title: 'Train our own',
+    body: 'Our self-perform crews are trained, mentored and promoted from within, so safe practices are built into how the work gets done.',
+  },
 ]
 
-export const stats = [
-  { value: 1984, label: 'Founded in Sanford, Florida', format: 'year' as const },
-  { value: 11, label: 'Offices across the Southeast' },
-  { value: 4, label: 'States: FL, TX, LA & NC' },
-  { value: 400, label: 'ENR Top 400 Contractor', prefix: 'Top ' },
+export const news = [
+  {
+    date: 'Oct 2025',
+    title: 'Wharton-Smith commits $1 million to Habitat for Humanity’s Legacy Point',
+    body: 'The largest investment in company history helps Habitat for Humanity Seminole-Apopka build a 19-home affordable community in Central Florida.',
+  },
+  {
+    date: 'Mar 2024',
+    title: 'Creating Connections: South AWWTF reclaimed water expansion opens',
+    body: 'A new reclaimed water expansion goes into service, putting treated water back to work for the community.',
+  },
+  {
+    date: 'Oct 2023',
+    title: 'Wharton-Smith makes the Golden 100, Fast 50 and ENR Top 400',
+    body: 'Recognition from the Orlando Business Journal and Engineering News-Record in the same season.',
+  },
+  {
+    date: 'Apr 2023',
+    title: 'Wharton-Smith completes the Hamlin Water Reclamation Facility',
+    body: 'A new 5 MGD facility for Orange County Utilities, designed to grow to 15 MGD and serve southwest Orange County.',
+  },
+]
+
+export const roles = [
+  'Project Managers',
+  'Superintendents',
+  'Project Engineers',
+  'Field Engineers',
+  'Estimators',
+  'Craft Professionals',
+  'Safety',
+  'Internships',
 ]
