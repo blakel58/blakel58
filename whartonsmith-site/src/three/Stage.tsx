@@ -8,8 +8,9 @@ import { Plant } from './Plant'
 import { School } from './School'
 import { Civic } from './Civic'
 import { Venue } from './Venue'
+import { Site } from './Site'
 
-export type SceneKey = 'plant' | 'school' | 'civic' | 'venue'
+export type SceneKey = 'plant' | 'school' | 'civic' | 'venue' | 'site'
 
 export type View = { pos: [number, number, number]; target: [number, number, number]; fov?: number }
 
@@ -21,6 +22,9 @@ export const views: Record<string, View & { scene: SceneKey }> = {
   'school-a': { scene: 'school', pos: [100, 62, 96], target: [4, 0, 0], fov: 28 },
   'school-b': { scene: 'school', pos: [-60, 22, 46], target: [-6, 3, 0], fov: 30 },
   'civic-a': { scene: 'civic', pos: [92, 58, 96], target: [2, 4, -2], fov: 28 },
+  'site-hero': { scene: 'site', pos: [96, 52, 104], target: [6, 6, -4], fov: 28 },
+  'site-low': { scene: 'site', pos: [60, 9, 46], target: [10, 10, -4], fov: 34 },
+  'site-4d': { scene: 'site', pos: [110, 80, 110], target: [6, 0, -2], fov: 28 },
   'venue-a': { scene: 'venue', pos: [96, 70, 104], target: [0, 4, 0], fov: 28 },
   'civic-b': { scene: 'civic', pos: [-30, 9, 48], target: [0, 9, 0], fov: 32 },
 }
@@ -88,6 +92,7 @@ function SceneContent({ scene }: { scene: SceneKey }) {
   if (scene === 'school') return <School />
   if (scene === 'civic') return <Civic />
   if (scene === 'venue') return <Venue />
+  if (scene === 'site') return <Site />
   return <Plant />
 }
 
@@ -99,6 +104,7 @@ export function Stage({
   onReady,
   className,
   dpr = [1, 1.5],
+  manual,
 }: {
   view: keyof typeof views | string
   instant?: boolean
@@ -107,8 +113,10 @@ export function Stage({
   onReady?: () => void
   className?: string
   dpr?: number | [number, number]
+  manual?: { current: number }
 }) {
   const view = views[viewKey] ?? views.hero
+  const sky = view.scene === 'site' ? '#dde2e4' : palette.sky
   const [start, setStart] = useState(0)
   useEffect(() => setStart(0.3), [])
 
@@ -121,9 +129,9 @@ export function Stage({
       gl={{ antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance', toneMapping: THREE.NoToneMapping }}
       camera={{ position: view.pos, fov: view.fov ?? 28, near: 1, far: 600 }}
     >
-      <color attach="background" args={[palette.sky]} />
-      <fog attach="fog" args={[palette.sky, 190, 460]} />
-      <BuildContext.Provider value={{ instant, start }}>
+      <color attach="background" args={[sky]} />
+      <fog attach="fog" args={[sky, 190, 460]} />
+      <BuildContext.Provider value={{ instant, start, manual }}>
         <Suspense fallback={null}>
           <Lights hq={instant} />
           <Ground />

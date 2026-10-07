@@ -19,6 +19,14 @@ export const palette = {
   track: '#c4937a',
   corten: '#b35d34',
   line: '#f7f4ef',
+  dirt: '#c9b597',
+  dirtDark: '#b49c7b',
+  concrete: '#dcd8d0',
+  yellow: '#f2b30f',
+  rebar: '#6d5543',
+  plywood: '#c8a36a',
+  steel: '#7d8389',
+  white: '#f4f3f0',
 }
 
 export const mats = {
@@ -35,10 +43,24 @@ export const mats = {
   track: new THREE.MeshStandardMaterial({ color: palette.track, roughness: 1 }),
   corten: new THREE.MeshStandardMaterial({ color: palette.corten, roughness: 0.7 }),
   line: new THREE.MeshStandardMaterial({ color: palette.line, roughness: 1 }),
+  dirt: new THREE.MeshStandardMaterial({ color: palette.dirt, roughness: 1 }),
+  dirtDark: new THREE.MeshStandardMaterial({ color: palette.dirtDark, roughness: 1 }),
+  concrete: new THREE.MeshStandardMaterial({ color: palette.concrete, roughness: 0.9 }),
+  yellow: new THREE.MeshStandardMaterial({ color: palette.yellow, roughness: 0.55 }),
+  rebar: new THREE.MeshStandardMaterial({ color: palette.rebar, roughness: 0.8 }),
+  plywood: new THREE.MeshStandardMaterial({ color: palette.plywood, roughness: 0.9 }),
+  steel: new THREE.MeshStandardMaterial({ color: palette.steel, roughness: 0.5, metalness: 0.3 }),
+  white: new THREE.MeshStandardMaterial({ color: palette.white, roughness: 0.8 }),
 }
 
-/** Build-in timing. `instant` renders everything finished (used for stills). */
-export const BuildContext = createContext<{ instant: boolean; start: number }>({ instant: true, start: 0 })
+/**
+ * Build-in timing. `instant` renders everything finished (used for stills);
+ * `manual` (a ref, in seconds) drives the build from a slider instead of the clock.
+ */
+export const BuildContext = createContext<{ instant: boolean; start: number; manual?: { current: number } }>({
+  instant: true,
+  start: 0,
+})
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 4)
 
@@ -50,9 +72,15 @@ export function Rise({ delay = 0, duration = 1.4, children, position }: {
   position?: [number, number, number]
 }) {
   const ref = useRef<THREE.Group>(null)
-  const { instant, start } = useContext(BuildContext)
+  const { instant, start, manual } = useContext(BuildContext)
   useFrame(({ clock }) => {
     if (!ref.current) return
+    if (manual) {
+      const t = Math.min(1, Math.max(0, (manual.current - delay) / duration))
+      ref.current.visible = t > 0
+      ref.current.scale.y = Math.max(0.0001, easeOut(t))
+      return
+    }
     if (instant) {
       ref.current.scale.y = 1
       ref.current.visible = true
@@ -192,9 +220,9 @@ export function TreeBand({ seed, inner, outer, count }: {
   )
 }
 
-export function Ground() {
+export function Ground({ mat = mats.ground }: { mat?: THREE.Material }) {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} material={mats.ground} receiveShadow>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} material={mat} receiveShadow>
       <planeGeometry args={[800, 800]} />
     </mesh>
   )

@@ -1,106 +1,120 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
-import { company, links, r } from '../data/site'
-import { Arrow, RevealLines, ease } from './ui'
-
-const Stage = lazy(() => import('../three/Stage').then((m) => ({ default: m.Stage })))
-
-function canRunLive() {
-  if (typeof window === 'undefined') return false
-  if (!window.matchMedia('(min-width: 900px)').matches) return false
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
-  try {
-    return !!document.createElement('canvas').getContext('webgl2')
-  } catch {
-    return false
-  }
-}
+import { company, hero, links, stats, ticker } from '../data/site'
+import { Arrow, CountUp, Lines, ease } from './ui'
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null)
-  const [live] = useState(canRunLive)
-  const [visible, setVisible] = useState(true)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
-  const textOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
-
-  useEffect(() => {
-    if (!ref.current) return
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting))
-    io.observe(ref.current)
-    return () => io.disconnect()
-  }, [])
+  const mediaY = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
 
   return (
     <section className="hero" id="top" ref={ref} aria-label="Introduction">
-      <div className="hero-stage" aria-hidden="true">
-        {!live && (
-          <motion.img
-            src={r('hero')}
-            alt=""
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2, ease }}
-          />
-        )}
-        {live && (
-          <Suspense fallback={null}>
-            <motion.div
-              style={{ position: 'absolute', inset: 0 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-            >
-              <Stage view="hero" interactive active={visible} />
-            </motion.div>
-          </Suspense>
-        )}
-      </div>
-      <div className="hero-fade" />
-
-      <motion.div className="wrap hero-meta" style={{ opacity: textOpacity }}>
-        <motion.span className="label" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 1 }}>
-          General contractor · Construction manager · Design-builder
-        </motion.span>
-        <motion.span className="label" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3, duration: 1 }}>
-          Fig. 01 · Water reclamation facility, study model
-        </motion.span>
+      <motion.div className="hero-media" style={{ y: mediaY }}>
+        <div className="shot">
+          {hero.video ? (
+            <video src={hero.video} poster={hero.image.src} autoPlay muted loop playsInline />
+          ) : (
+            <motion.img
+              src={hero.image.src}
+              alt=""
+              initial={{ scale: 1.25 }}
+              animate={{ scale: 1.04 }}
+              transition={{ duration: 6, ease: [0.16, 1, 0.3, 1] }}
+            />
+          )}
+          {!hero.image.real && !hero.video && (
+            <span className="shot-tag hero-tag" style={{ top: 'calc(var(--nav-h) + 12px)', left: 'auto', right: 12 }}>
+              <span>Image / video area · {hero.image.shot}</span>
+            </span>
+          )}
+        </div>
       </motion.div>
+      <div className="hero-shade" />
 
-      <motion.div className="hero-content" style={{ y: textY, opacity: textOpacity }}>
-        <div className="wrap hero-row">
-          <RevealLines
-            as="h1"
-            className="display"
-            immediate
-            delay={0.5}
-            lines={[
-              'Built to',
-              <>
-                <em>endure.</em>
-              </>,
-            ]}
-          />
-          <motion.div
-            className="hero-side"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease, delay: 1.1 }}
-          >
-            <p>
-              Water, civic and education infrastructure for the communities of the American Southeast, built by
-              Wharton-Smith since {company.founded}.
-            </p>
-            <a className="link" href="#work">
-              See the work <Arrow />
+      <div className="wrap hero-content">
+        <motion.div
+          className="label"
+          style={{ color: 'var(--yellow)' }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease, delay: 0.3 }}
+        >
+          General Contractor · Construction Manager · Design-Builder
+        </motion.div>
+        <Lines
+          as="h1"
+          immediate
+          delay={0.4}
+          lines={[
+            'We build what',
+            'the Southeast',
+            <>
+              <span className="hl">runs on.</span>
+            </>,
+          ]}
+        />
+        <motion.div
+          className="hero-row"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease, delay: 1 }}
+        >
+          <p>
+            Water and wastewater plants, schools, justice centers and public facilities, built by {company.name} and our
+            own crews since {company.founded}.
+          </p>
+          <div className="hero-ctas">
+            <a className="btn btn-yellow" href="#water">
+              See our work <Arrow />
             </a>
-            <span style={{ display: 'inline-block', width: 28 }} />
-            <a className="link" href={links.contact}>
-              Start a project <Arrow />
+            <a className="btn btn-ghost" href={links.contact}>
+              Request a proposal <Arrow />
             </a>
-          </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
+      <motion.div className="hero-stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 1.2 }}>
+        <div className="wrap">
+          {stats.map((s) => (
+            <div className="hero-stat" key={s.label}>
+              <strong>
+                {s.prefix}
+                <CountUp to={s.value} from={s.from ?? 0} />
+                {s.suffix && <em>{s.suffix}</em>}
+              </strong>
+              <span>{s.label}</span>
+            </div>
+          ))}
+          <div className="hero-stat">
+            <strong>
+              <em>ENR</em> 400
+            </strong>
+            <span>Top contractors in the U.S.</span>
+          </div>
         </div>
       </motion.div>
     </section>
+  )
+}
+
+export function Ticker() {
+  const items = [...ticker, ...ticker]
+  return (
+    <div className="ticker" aria-hidden="true">
+      <motion.div
+        className="ticker-track"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
+      >
+        {[...items, ...items].map((t, i) => (
+          <span className="ticker-item" key={i}>
+            {t}
+            <i />
+          </span>
+        ))}
+      </motion.div>
+    </div>
   )
 }

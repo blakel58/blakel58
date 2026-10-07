@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react'
-import { links, nav } from '../data/site'
+import { company, links, nav } from '../data/site'
 import { Arrow, ease } from './ui'
+
+export function Logo() {
+  return (
+    <span className="logo">
+      <span className="logo-mark">{company.short}</span>
+      <span className="logo-name">
+        {company.name}
+        <small>Since {company.founded}</small>
+      </span>
+    </span>
+  )
+}
 
 export function Nav() {
   const { scrollY } = useScroll()
@@ -11,8 +23,8 @@ export function Nav() {
 
   useMotionValueEvent(scrollY, 'change', (y) => {
     const prev = scrollY.getPrevious() ?? 0
-    setSolid(y > window.innerHeight * 0.8)
-    setHidden(y > prev && y > 200)
+    setSolid(y > 40)
+    setHidden(y > prev && y > 300)
   })
 
   useEffect(() => {
@@ -24,14 +36,9 @@ export function Nav() {
 
   return (
     <>
-      <motion.header
-        className={`nav ${solid && !open ? 'is-solid' : ''} ${hidden && !open ? 'is-hidden' : ''}`}
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease, delay: 0.4 }}
-      >
-        <a href="#top" className="wordmark" aria-label="Wharton-Smith home">
-          Wharton<i>–</i>Smith
+      <header className={`nav ${solid || open ? 'is-solid' : ''} ${hidden && !open ? 'is-hidden' : ''}`}>
+        <a href="#top" aria-label={`${company.name} home`}>
+          <Logo />
         </a>
         <nav aria-label="Primary">
           <ul className="nav-links">
@@ -42,15 +49,15 @@ export function Nav() {
             ))}
           </ul>
         </nav>
-        <div className="nav-right">
-          <a className="pill" href={links.contact}>
-            Start a project <Arrow />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <a className="btn btn-yellow" href={links.contact}>
+            Request a proposal <Arrow />
           </a>
           <button className="menu-btn" aria-expanded={open} aria-controls="menu" onClick={() => setOpen((o) => !o)}>
             {open ? 'Close' : 'Menu'}
           </button>
         </div>
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {open && (
@@ -60,7 +67,7 @@ export function Nav() {
             initial={{ clipPath: 'inset(0 0 100% 0)' }}
             animate={{ clipPath: 'inset(0 0 0% 0)' }}
             exit={{ clipPath: 'inset(0 0 100% 0)' }}
-            transition={{ duration: 0.8, ease }}
+            transition={{ duration: 0.6, ease }}
           >
             <ul>
               {[...nav, { label: 'Contact', href: links.contact }].map((n, i) => (
@@ -70,7 +77,7 @@ export function Nav() {
                     onClick={() => setOpen(false)}
                     initial={{ y: '100%' }}
                     animate={{ y: 0 }}
-                    transition={{ duration: 0.9, ease, delay: 0.2 + i * 0.06 }}
+                    transition={{ duration: 0.7, ease, delay: 0.15 + i * 0.05 }}
                   >
                     {n.label}
                     <span>0{i + 1}</span>
@@ -78,7 +85,9 @@ export function Nav() {
                 </li>
               ))}
             </ul>
-            <span className="label">750 Monroe Road, Sanford, Florida</span>
+            <a className="btn btn-yellow" href={links.contact} onClick={() => setOpen(false)}>
+              Request a proposal <Arrow />
+            </a>
           </motion.div>
         )}
       </AnimatePresence>

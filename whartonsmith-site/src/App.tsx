@@ -1,16 +1,18 @@
 import { useEffect } from 'react'
 import { MotionConfig } from 'motion/react'
 import Lenis from 'lenis'
-import { Careers, Community, Footer, Footprint, HowWeBuild } from './components/Company'
-import { Hero } from './components/Hero'
+import { Careers, Crew, Footer, Locations } from './components/Company'
+import { Commercial, Divisions, Water } from './components/Divisions'
+import { Hero, Ticker } from './components/Hero'
 import { Nav } from './components/Nav'
-import { Bleed, Statement, Water } from './components/Story'
-import { Expertise, Work } from './components/Work'
+import { Process } from './components/Process'
+import { Technology } from './components/Tech'
+import { isDemo } from './data/site'
 
 export default function App() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.09 })
+    const lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.1 })
     return () => lenis.destroy()
   }, [])
 
@@ -22,17 +24,18 @@ export default function App() {
       <Nav />
       <main id="main">
         <Hero />
-        <Statement />
-        <Bleed />
+        <Ticker />
+        <Divisions />
         <Water />
-        <Expertise />
-        <Work />
-        <HowWeBuild />
-        <Footprint />
-        <Community />
+        <Commercial />
+        <Technology />
+        <Process />
+        <Crew />
+        <Locations />
         <Careers />
       </main>
       <Footer />
+      {isDemo && <div className="demo-banner">Design preview · placeholder name & projects</div>}
     </MotionConfig>
   )
 }
