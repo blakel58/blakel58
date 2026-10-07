@@ -1,17 +1,19 @@
+import { useEffect } from 'react'
 import { MotionConfig } from 'motion/react'
-import { Careers, CtaBand, News } from './components/Careers'
-import { Footer } from './components/Footer'
-import { Footprint } from './components/Footprint'
+import Lenis from 'lenis'
+import { Careers, Community, Footer, Footprint, HowWeBuild } from './components/Company'
 import { Hero } from './components/Hero'
-import { Credentials, Intro } from './components/Intro'
-import { Markets } from './components/Markets'
 import { Nav } from './components/Nav'
-import { Projects } from './components/Projects'
-import { Safety } from './components/Safety'
-import { SelfPerform, Services } from './components/Services'
-import { WaterProcess } from './components/WaterProcess'
+import { Bleed, Statement, Water } from './components/Story'
+import { Expertise, Work } from './components/Work'
 
 export default function App() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.09 })
+    return () => lenis.destroy()
+  }, [])
+
   return (
     <MotionConfig reducedMotion="user">
       <a href="#main" className="skip-link">
@@ -20,18 +22,15 @@ export default function App() {
       <Nav />
       <main id="main">
         <Hero />
-        <Credentials />
-        <Intro />
-        <Markets />
-        <WaterProcess />
-        <Services />
-        <SelfPerform />
-        <Projects />
-        <Safety />
+        <Statement />
+        <Bleed />
+        <Water />
+        <Expertise />
+        <Work />
+        <HowWeBuild />
         <Footprint />
-        <News />
+        <Community />
         <Careers />
-        <CtaBand />
       </main>
       <Footer />
     </MotionConfig>
