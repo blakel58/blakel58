@@ -1,20 +1,16 @@
-// Company facts, projects and copy, gathered from whartonsmith.com search
-// listings and public news coverage (Oct 2026). Verify with Wharton-Smith
-// before launch. Items marked CONFIRM are reasonable placeholders.
-//
-// site.demo.ts mirrors this file with placeholder branding; building with
-// VITE_DEMO=1 swaps it in (used for the shareable design preview).
+// Placeholder-branded copy of site.ts, used when building with VITE_DEMO=1.
+// Keep its exports in sync with site.ts.
 
-export const isDemo = false
+export const isDemo = true
 
 export const company = {
-  name: 'Wharton-Smith',
-  short: 'WS',
-  legalName: 'Wharton-Smith, Inc.',
+  name: 'Your Company',
+  short: 'YC',
+  legalName: 'Your Company, Inc.',
   founded: 1984,
-  hq: { street: '750 Monroe Road', city: 'Sanford, FL 32771' },
-  linkedin: 'https://www.linkedin.com/company/wharton-smith-inc-',
-  facebook: 'https://www.facebook.com/whartonsmithinc/',
+  hq: { street: '100 Main Street', city: 'Anytown, FL' },
+  linkedin: '#',
+  facebook: '#',
 }
 
 // PLACEHOLDER hrefs: point these at the real pages.
@@ -64,20 +60,20 @@ export const water = {
   capabilities: ['Water treatment plants', 'Water reclamation', 'Pump stations', 'Conveyance & force mains', 'Reuse & storage', 'Membranes & filtration'],
   projects: [
     {
-      title: 'Hamlin Water Reclamation Facility',
-      location: 'Winter Garden, FL',
-      specs: ['5 MGD → 15 MGD', '$110.6M', 'GC', '2023'],
+      title: 'Regional Water Reclamation Facility',
+      location: 'Central Florida',
+      specs: ['5 MGD → 15 MGD', 'GC', '2023'],
       image: img('plant-side', 'Project hero photo'),
     },
     {
-      title: 'Northwest Regional WRF Expansion',
-      location: 'Hillsborough County, FL',
+      title: 'Wastewater Plant Expansion',
+      location: 'Gulf Coast, FL',
       specs: ['10 → 30 MGD', 'Expansion'],
       image: img('plant-aerial', 'Project hero photo'),
     },
     {
-      title: 'Catawba River WTP Raw Water Reservoir',
-      location: 'Lancaster County, SC',
+      title: 'Raw Water Reservoir Expansion',
+      location: 'The Carolinas',
       specs: ['Reservoir', 'Water treatment'],
       image: img('site-4d', 'Project hero photo'),
     },
@@ -95,27 +91,27 @@ export const commercial = {
   ],
   projects: [
     {
-      title: 'Seminole County Justice Center Annex & Garage',
-      location: 'Sanford, FL',
+      title: 'County Justice Center & Garage',
+      location: 'Central Florida',
       specs: ['Design-Build', '105,000 SF', '5-level garage'],
       image: img('civic-a', 'Project hero photo'),
     },
     {
-      title: 'Villages Charter High School, South Campus',
-      location: 'The Villages, FL',
+      title: 'Charter High School Campus',
+      location: 'Central Florida',
       specs: ['450,000 SF'],
       image: img('school-a', 'Project hero photo'),
     },
     {
-      title: 'Davenport High School',
-      location: 'Davenport, FL',
+      title: 'Prototype High School',
+      location: 'Polk County, FL',
       specs: ['345,000 SF', 'Prototype'],
       image: img('school-b', 'Project hero photo'),
     },
   ],
 }
 
-// CONFIRM: technology Wharton-Smith actually uses.
+// CONFIRM: technology actually in use.
 export const tools = [
   { key: 'bim', title: 'VDC & BIM coordination', body: 'Every pipe, duct and rebar cage is modeled and clash-checked before it reaches the field.' },
   { key: 'sched', title: '4D sequencing', body: 'The model is tied to the schedule, so owners and crews can watch the job get built before day one.' },

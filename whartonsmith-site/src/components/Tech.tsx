@@ -62,7 +62,7 @@ function Viewer() {
         )}
         <div className="viewer-hud">
           <b>4D model</b>
-          <span>Week {Math.round((value / 100) * WEEKS)}</span>
+          <span>Week {live ? Math.round((value / 100) * WEEKS) : WEEKS}</span>
         </div>
       </div>
       {live && (
