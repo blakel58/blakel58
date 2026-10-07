@@ -63,11 +63,9 @@ export function Hero() {
           General contractor · Construction manager · Design-builder
         </motion.span>
         <motion.span className="label" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3, duration: 1 }}>
-          Est. {company.founded}
+          Fig. 01 · Water reclamation facility, study model
         </motion.span>
       </motion.div>
-
-      <span className="label hero-caption">Fig. 01 · Water reclamation facility, study model</span>
 
       <motion.div className="hero-content" style={{ y: textY, opacity: textOpacity }}>
         <div className="wrap hero-row">

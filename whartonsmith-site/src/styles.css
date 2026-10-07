@@ -758,13 +758,13 @@ h3 {
 }
 .work-card {
   flex: none;
-  width: clamp(300px, 34vw, 600px);
+  width: clamp(280px, 28vw, 500px);
 }
 .work-card .media {
   aspect-ratio: 4 / 3.1;
 }
 .work-card:nth-child(even) {
-  margin-top: 6vh;
+  margin-top: 4vh;
 }
 .work-card h3 {
   font-family: var(--serif);
@@ -956,7 +956,7 @@ h3 {
   align-items: center;
 }
 .footprint h2 {
-  font-size: clamp(52px, 6vw, 110px);
+  font-size: clamp(46px, 4.6vw, 88px);
 }
 .footprint-lede {
   margin: 28px 0 40px;
