@@ -220,7 +220,7 @@ export function Community() {
         <div className="community-grid">
           <div className="community-num">
             $<CountUp to={1} from={0} duration={1} />
-            <em style={{ fontSize: '0.5em' }}>million</em>
+            <em style={{ fontSize: '0.5em', marginLeft: '0.12em' }}>million</em>
           </div>
           <div>
             <RevealLines

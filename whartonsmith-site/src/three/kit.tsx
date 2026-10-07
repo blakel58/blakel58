@@ -17,7 +17,7 @@ export const palette = {
   treeDark: '#919985',
   grass: '#c3c8ac',
   track: '#c4937a',
-  corten: '#a4502b',
+  corten: '#b35d34',
   line: '#f7f4ef',
 }
 

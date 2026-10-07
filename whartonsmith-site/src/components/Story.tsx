@@ -74,6 +74,7 @@ export function Bleed() {
       <div className="bleed-sticky">
         <motion.div className="bleed-frame" style={{ clipPath: clip }}>
           <motion.img src={r('plant-low')} alt="Study model of secondary clarifiers at a water reclamation facility" style={{ scale }} />
+          <motion.div className="bleed-scrim" style={{ opacity: textOpacity }} />
         </motion.div>
         <motion.h2 className="display bleed-text" style={{ opacity: textOpacity, y: textY }}>
           Clean water is

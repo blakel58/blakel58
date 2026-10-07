@@ -25,7 +25,7 @@ export const views: Record<string, View & { scene: SceneKey }> = {
   'civic-b': { scene: 'civic', pos: [-30, 9, 48], target: [0, 9, 0], fov: 32 },
 }
 
-function Lights({ sun = [-85, 40, 34] as [number, number, number] }) {
+function Lights({ sun = [-85, 40, 34] as [number, number, number], hq = true }) {
   return (
     <>
       <hemisphereLight args={['#f3f5f7', '#a89e8f', 1.0]} />
@@ -34,7 +34,7 @@ function Lights({ sun = [-85, 40, 34] as [number, number, number] }) {
         intensity={3.6}
         color="#ffe7cc"
         castShadow
-        shadow-mapSize={[4096, 4096]}
+        shadow-mapSize={hq ? [4096, 4096] : [2048, 2048]}
         shadow-bias={-0.0004}
         shadow-normalBias={0.04}
         shadow-camera-left={-110}
@@ -98,7 +98,7 @@ export function Stage({
   active = true,
   onReady,
   className,
-  dpr = [1, 2],
+  dpr = [1, 1.5],
 }: {
   view: keyof typeof views | string
   instant?: boolean
@@ -125,15 +125,15 @@ export function Stage({
       <fog attach="fog" args={[palette.sky, 190, 460]} />
       <BuildContext.Provider value={{ instant, start }}>
         <Suspense fallback={null}>
-          <Lights />
+          <Lights hq={instant} />
           <Ground />
           <SceneContent scene={view.scene} />
         </Suspense>
       </BuildContext.Provider>
       <Rig view={view} interactive={interactive} />
       <Ready onReady={onReady} />
-      <EffectComposer multisampling={4}>
-        <N8AO aoRadius={5} intensity={3} distanceFalloff={1.4} quality="high" halfRes={false} />
+      <EffectComposer multisampling={instant ? 4 : 2}>
+        <N8AO aoRadius={5} intensity={3} distanceFalloff={1.4} quality={instant ? 'high' : 'medium'} halfRes={!instant} />
         <Vignette offset={0.35} darkness={0.35} />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>

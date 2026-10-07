@@ -522,6 +522,11 @@ h3 {
   height: 100%;
   object-fit: cover;
 }
+.bleed-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(21, 20, 19, 0.45), rgba(21, 20, 19, 0.15));
+}
 .bleed-text {
   position: relative;
   z-index: 1;
