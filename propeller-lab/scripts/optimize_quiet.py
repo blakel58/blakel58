@@ -13,6 +13,7 @@ from proplab.geometry import parametric_blade
 from proplab.optimize import Mission, optimise, evaluate_blade
 from proplab.tonal import ArmInteraction
 from proplab import plots
+from proplab.render import gallery
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 ap.add_argument("--motor", default="2207-1950kv-6S", choices=MOTORS)
@@ -79,4 +80,8 @@ plots.pareto_plot(a.out + "_pareto.png", pareto, [(nm, m, ok) for nm, _, m, ok i
                   "Quiet vs efficient: every point is a blade that meets the thrust requirement\n" + ttl)
 ref = next((b for b in base if b[0].endswith("x4x3")), base[0])
 plots.design_sheet(a.out + "_designs.png", sheet + [(f"generic {ref[0]}", ref[1], ref[2])], ttl)
-print(f"\nwrote {a.out}_pareto.json, {a.out}_pareto.png, {a.out}_designs.png")
+cap = lambda bl, m: [f"{bl.B} blades, {m['dBA']:.1f} dBA in hover", f"{m['hover_power']:.1f} W per motor, {m['hover_rpm']:.0f} rpm",
+                     f"peak {m['max_thrust']/g:.0f} g at {m['max_current']:.0f} A"]
+gallery(a.out + "_render.png", [(lb, bl, cap(bl, m)) for lb, bl, m in sheet]
+        + [(f"generic {ref[0]}", ref[1], cap(ref[1], ref[2]))], ttl)
+print(f"\nwrote {a.out}_render.png, {a.out}_pareto.json, {a.out}_pareto.png, {a.out}_designs.png")
