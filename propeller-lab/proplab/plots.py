@@ -83,3 +83,23 @@ def pareto_plot(path, pareto, baselines, picks, title):
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
+
+
+def family_plot(path, families, marks, title):
+    """families: list of (label, [points with hover_power, dBA]); marks: extra
+    labelled single points [(label, metrics)]."""
+    fig, ax = plt.subplots(figsize=(9, 6))
+    for i, (label, pts) in enumerate(families):
+        ax.scatter([p["hover_power"] for p in pts], [p["dBA"] for p in pts], s=42,
+                   color=SERIES[i], edgecolor=SURF, lw=1, label=label, zorder=3)
+    for label, m in marks:
+        ax.scatter(m["hover_power"], m["dBA"], marker="s", s=60, color=INK2, zorder=4)
+        ax.annotate(label, (m["hover_power"], m["dBA"]), xytext=(7, 5),
+                    textcoords="offset points", fontsize=8, color=INK2)
+    ax.set_xlabel("hover electrical power per motor (W)")
+    ax.set_ylabel("hover noise, all rotors (dBA)")
+    ax.set_title(title)
+    ax.legend(fontsize=9)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)

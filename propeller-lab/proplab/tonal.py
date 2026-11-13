@@ -83,9 +83,10 @@ def single_blade_harmonics(src, omega, obs, orders, air, n_t=None, arm=None, R=N
     Mr = Mt * e_psi_r
     Mdot_r = -(omega ** 2 * r_s / c0) * e_rad_r
     fz, ft = src["fz"][:, None], src["ft"][:, None]
+    fr = src["fr"][:, None] if "fr" in src else 0.0     # radial force on blade
     # force exerted on the air = -(force on blade)
-    Fr = -fz * hz + ft * e_psi_r
-    Fdot_r = -ft * omega * e_rad_r
+    Fr = -fz * hz + ft * e_psi_r - fr * e_rad_r
+    Fdot_r = -ft * omega * e_rad_r - fr * omega * e_psi_r
     if arm is not None:
         dpsi = (psi - arm.azimuth + np.pi) % (2 * np.pi) - np.pi
         sig = 0.5 * arm.width / r_s                     # angular half-width
@@ -114,20 +115,39 @@ def single_blade_harmonics(src, omega, obs, orders, air, n_t=None, arm=None, R=N
 
 
 def tonal_noise(blade, sol, observers, air, n_harm=10, n_chord=5, arm=None):
+    """Tones of a conventional blade + BEMT solution (see tonal_from_sources)."""
+    return tonal_from_sources(blade_sources(blade, sol, n_chord), blade.azimuths, sol.omega,
+                              blade.R, observers, air, n_harm, arm)
+
+
+def tonal_from_sources(src, azimuths, om, R, observers, air, n_harm=10, arm=None):
     """Tones at each observer.  Returns (freqs [Hz], p_rms^2 [n_obs, n_tones],
     parts) where parts holds the loading-only and thickness-only p_rms^2."""
-    B = blade.B
-    equal = np.allclose(np.diff(np.sort(blade.azimuths % (2 * np.pi))), 2 * np.pi / B, atol=1e-6) \
+    B = len(azimuths)
+    equal = np.allclose(np.diff(np.sort(azimuths % (2 * np.pi))), 2 * np.pi / B, atol=1e-6) \
         if B > 1 else True
     orders = np.arange(1, n_harm + 1) * B if equal else np.arange(1, n_harm * B + 1)
-    S = np.exp(-1j * orders[:, None] * blade.azimuths[None, :]).sum(1)
-    src = blade_sources(blade, sol, n_chord)
-    om = sol.omega
+    S = np.exp(-1j * orders[:, None] * azimuths[None, :]).sum(1)
     tot, load, thick = [], [], []
     for x in np.atleast_2d(observers):
-        PL, PT = single_blade_harmonics(src, om, x, orders, air, arm=arm, R=blade.R)
+        PL, PT = single_blade_harmonics(src, om, x, orders, air, arm=arm, R=R)
         tot.append(2 * np.abs((PL + PT) * S) ** 2)
         load.append(2 * np.abs(PL * S) ** 2)
         thick.append(2 * np.abs(PT * S) ** 2)
     return orders * om / (2 * np.pi), np.array(tot), dict(loading=np.array(load),
                                                          thickness=np.array(thick))
+
+
+def ribbon_sources(rb, sol, n_chord=5):
+    """Point sources for a ribbon blade + VLM solution (any 3D shape)."""
+    sc, wl, wt = _chordwise(n_chord)
+    g = rb.frames()
+    pos = g["mid"][:, None, :] + ((sc[None, :] - 0.25) * rb.chord[:, None])[..., None] * g["tcv"][:, None, :]
+    F = sol.F[:, None, :] * wl[None, :, None]
+    x, y = pos[..., 0].ravel(), pos[..., 1].ravel()
+    r, psi = np.hypot(x, y), np.arctan2(y, x)
+    Fx, Fy = F[..., 0].ravel(), F[..., 1].ravel()
+    vol = (0.685 * np.abs(rb.tc) * rb.chord ** 2 * g["len"])[:, None] * wt
+    return dict(r=r, psi0=psi, z=pos[..., 2].ravel(), fz=F[..., 2].ravel(),
+                ft=-(-np.sin(psi) * Fx + np.cos(psi) * Fy),
+                fr=np.cos(psi) * Fx + np.sin(psi) * Fy, vol=vol.ravel())

@@ -32,10 +32,29 @@ def blade_surface(blade, n_span=60, n_chord=40):
     return np.repeat(r[:, None], len(S), 1), -aft, z
 
 
+def _section(n_chord):
+    s = 0.5 * (1 - np.cos(np.linspace(0, np.pi, n_chord)))
+    yt = 5 * (0.2969 * np.sqrt(s) - 0.126 * s - 0.3516 * s ** 2 + 0.2843 * s ** 3 - 0.1036 * s ** 4)
+    p = 0.4
+    yc = np.where(s < p, (2 * p * s - s ** 2) / p ** 2, ((1 - 2 * p) + 2 * p * s - s ** 2) / (1 - p) ** 2)
+    return (np.concatenate([s, s[::-1]]), np.concatenate([yt, -yt[::-1]]),
+            np.concatenate([yc, yc[::-1]]))
+
+
+def ribbon_surface(rb, n_chord=30):
+    """Section loops along a ribbon blade (any 3D path, e.g. a toroidal loop)."""
+    g = rb.frames()
+    S, T, C = _section(n_chord)
+    xi = (S[None, :] - 0.25) * rb.chord[:, None]
+    eta = (rb.camber[:, None] * C[None, :] + rb.tc[:, None] * T[None, :]) * rb.chord[:, None]
+    X = g["mid"][:, None, :] + xi[..., None] * g["tcv"][:, None, :] + eta[..., None] * g["n"][:, None, :]
+    return X[..., 0], X[..., 1], X[..., 2]
+
+
 def draw_prop(ax, blade, color, elev=90, azim=-90, zoom=1.55):
     ls = LightSource(azdeg=315, altdeg=50)
     rgb = np.array(to_rgb(color))
-    X, Y, Z = blade_surface(blade)
+    X, Y, Z = ribbon_surface(blade) if hasattr(blade, "P") else blade_surface(blade)
     for psi in blade.azimuths:
         c, s = np.cos(psi), np.sin(psi)
         ax.plot_surface((X * c - Y * s) * 1e3, (X * s + Y * c) * 1e3, Z * 1e3, color=rgb,

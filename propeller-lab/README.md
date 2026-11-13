@@ -9,6 +9,8 @@ pip install -r requirements.txt
 python -m pytest tests                      # physics checks
 python scripts/compare_props.py             # which stock prop suits a motor
 python scripts/optimize_quiet.py --pop 80 --gens 60 --out results/5in_6S
+python scripts/render_results.py results/5in_6S          # redraw figures only
+python scripts/optimize_toroidal.py --conventional results/5in_6S --out results/5in_6S_toroidal
 ```
 
 ## Prop naming
@@ -30,6 +32,7 @@ blade (`atan(pitch / (2 pi r))`, steep at the root, shallow at the tip).
 | Installed tones | Optional lift dip each time a blade crosses a frame arm, which is what produces the long train of blade-pass harmonics on a real quad | `proplab/tonal.py` |
 | Broadband noise | Brooks-Pope-Marcolini airfoil self-noise per strip: turbulent trailing edge, separation, laminar vortex shedding, tip vortex; 1/3-octave bands | `proplab/broadband.py` |
 | Ratings | A-weighted level averaged over listeners at and below the rotor plane | `proplab/noise.py` |
+| Loop / toroidal blades | Vortex-lattice solver for a blade following any 3D path, with a prescribed contracting helical wake and the same section polar; a loop is two arms joined at the tip, so circulation is carried round the tip instead of being shed as a tip vortex | `proplab/vlm.py`, `proplab/loop.py` |
 | Design search | NSGA-II over blade count, chord and pitch distributions, tip sweep, camber and blade spacing; objectives are hover dBA and hover power, constrained by peak thrust and motor current | `proplab/optimize.py` |
 
 ## How far to trust it
@@ -60,8 +63,15 @@ Known gaps, in order of importance:
 4. **No structural or aeroelastic model.** Geometry bounds keep blades within
    the range of commercial props, but thin swept tips flex and flutter in ways
    that are not captured.
-5. **Toroidal (loop) props** cannot be represented by blade-element theory;
-   they need CFD.
+5. **Toroidal (loop) props** use the vortex-lattice solver, which is
+   mid-fidelity: the wake shape is prescribed, not computed, so wake roll-up
+   and blade-vortex interaction are not resolved. Where the loop turns at the
+   tip the band runs almost along the flow and strip aerodynamics are crude.
+   Broadband noise for loops uses the same BPM strip model with no tip-vortex
+   term. On conventional props the two solvers agree on thrust within a few
+   percent; the vortex-lattice power is about 10% lower. Only compare loops
+   with conventional blades evaluated on the same solver
+   (`optimize_toroidal.py` does this).
 6. Forward flight is axial only (climb), not edgewise.
 
 The sensible next step is to print or mould one or two of the optimiser's picks

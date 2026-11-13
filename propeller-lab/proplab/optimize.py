@@ -178,18 +178,17 @@ def _offspring(X, rank, crowd, rng, eta_c=15, eta_m=20):
     return np.array(kids[:n])
 
 
-def optimise(mission=None, pop=80, generations=50, seed=0, workers=4, seeds=(), log=print):
-    """Run NSGA-II.  Returns the feasible Pareto set as a list of dicts sorted
-    from quietest to most efficient, plus the per-generation history."""
-    mission = mission or Mission()
+def nsga2(eval_fn, n_var, mission, pop=80, generations=50, seed=0, workers=4, seeds=(), log=print):
+    """Generic NSGA-II loop.  eval_fn(x) -> ((f1, f2), violation, metrics) and
+    must be a module-level function; `mission` is handed to each worker."""
     rng = np.random.default_rng(seed)
-    X = rng.random((pop, len(VARS)))
+    X = rng.random((pop, n_var))
     for i, s in enumerate(seeds):
         X[i] = s
     history = []
     with Pool(workers, initializer=_init, initargs=(mission,)) as pool:
         def run(X):
-            out = pool.map(_eval, list(X), chunksize=2)
+            out = pool.map(eval_fn, list(X), chunksize=2)
             return (np.array([o[0] for o in out]), np.array([o[1] for o in out]),
                     [o[2] for o in out])
         F, V, Mx = run(X)
@@ -228,5 +227,12 @@ def optimise(mission=None, pop=80, generations=50, seed=0, workers=4, seeds=(), 
     fronts, _ = _sort(F, V)
     best = [i for i in fronts[0] if V[i] == 0]
     best.sort(key=lambda i: F[i, 0])
-    pareto = [dict(x=X[i].tolist(), design=decode(X[i], mission), **Mx[i]) for i in best]
-    return pareto, history
+    return [(X[i], Mx[i]) for i in best], history
+
+
+def optimise(mission=None, pop=80, generations=50, seed=0, workers=4, seeds=(), log=print):
+    """Search conventional blades (blade-element solver).  Returns the feasible
+    Pareto set sorted from quietest to most efficient, plus the history."""
+    mission = mission or Mission()
+    best, history = nsga2(_eval, len(VARS), mission, pop, generations, seed, workers, seeds, log)
+    return [dict(x=x.tolist(), design=decode(x, mission), **m) for x, m in best], history

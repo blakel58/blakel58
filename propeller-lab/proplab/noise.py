@@ -1,7 +1,7 @@
 """Combine tones and broadband into spectra and single-number ratings."""
 import numpy as np
-from .tonal import tonal_noise, ArmInteraction
-from .broadband import broadband_noise, THIRD_OCT
+from .tonal import tonal_from_sources, blade_sources, ribbon_sources, ArmInteraction
+from .broadband import broadband_from_strips, blade_strips, ribbon_strips, THIRD_OCT
 
 P_REF = 2e-5
 
@@ -26,15 +26,20 @@ def default_observers(distance=1.5, below_deg=(0, 15, 30, 45, 60, 75)):
 
 def noise_report(blade, sol, observers=None, air=None, n_harm=None, tripped=False,
                  lbl=True, n_rotors=1, arm=None, n_chord=5):
-    """Spectra and ratings.  Levels are energy-averaged over the observers and
-    scaled incoherently by n_rotors (+6 dB for a quad)."""
+    """Spectra and ratings for a conventional blade (BEMT solution) or a
+    ribbon blade (VLM solution).  Levels are energy-averaged over the
+    observers and scaled incoherently by n_rotors (+6 dB for a quad)."""
     air = air or sol.air
     obs = default_observers() if observers is None else np.atleast_2d(observers)
+    if hasattr(blade, "P"):                                  # Ribbon + VlmResult
+        src, strips = ribbon_sources(blade, sol, n_chord), ribbon_strips(blade, sol)
+    else:
+        src, strips = blade_sources(blade, sol, n_chord), blade_strips(blade, sol)
+    bpf = sol.rpm / 60 * blade.B
     if n_harm is None:   # steady tones die off fast; arm pulses need many harmonics
-        bpf = sol.rpm / 60 * blade.B
         n_harm = 8 if arm is None else int(np.clip(12000 / bpf, 8, 40))
-    ft, pt, tparts = tonal_noise(blade, sol, obs, air, n_harm, n_chord, arm)
-    pb, bparts = broadband_noise(blade, sol, obs, air, tripped=tripped, lbl=lbl)
+    ft, pt, tparts = tonal_from_sources(src, blade.azimuths, sol.omega, blade.R, obs, air, n_harm, arm)
+    pb, bparts = broadband_from_strips(strips, blade.B, obs, air, tripped=tripped, lbl=lbl)
     pt, pb = pt * n_rotors, pb * n_rotors
     keep = ft <= 20000
     wt, wb = 10 ** (a_weight(ft) / 10), 10 ** (a_weight(THIRD_OCT) / 10)
@@ -50,4 +55,4 @@ def noise_report(blade, sol, observers=None, air=None, n_harm=None, tripped=Fals
         tone_thickness_spl=db(tparts["thickness"].mean(0) * n_rotors),
         band_freqs=THIRD_OCT, band_spl=db(pb.mean(0)),
         band_parts={k: db(v.mean(0) * n_rotors) for k, v in bparts.items()},
-        bpf=sol.rpm / 60 * blade.B)
+        bpf=bpf)

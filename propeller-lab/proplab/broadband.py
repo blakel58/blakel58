@@ -136,37 +136,62 @@ def tip_noise(f, c_tip, U_tip, alpha_tip_deg, air):
     return 10 ** (spl / 10) * P_REF ** 2
 
 
-def _directivity(blade, sol, obs, n_az=16):
+def _directivity(strips, obs, air, n_az=16):
     """Azimuth-averaged high-frequency directivity Dh / r_e^2 per strip."""
-    psi = 2 * np.pi * (np.arange(n_az) + 0.5) / n_az
-    r = blade.r[:, None]
-    th = blade.twist[:, None]
-    cs, sn = np.cos(psi)[None, :], np.sin(psi)[None, :]
-    d = np.stack([obs[0] - r * cs, obs[1] - r * sn, obs[2] + 0 * r * cs], -1)
-    re = np.linalg.norm(d, axis=-1)
-    e_psi = np.stack([-sn + 0 * r, cs + 0 * r, 0 * r * cs], -1)
-    e_rad = np.stack([cs + 0 * r, sn + 0 * r, 0 * r * cs], -1)
-    ez = np.array([0, 0, 1.0])
-    xe = -np.cos(th)[..., None] * e_psi - np.sin(th)[..., None] * ez   # LE -> TE
-    ze = np.cross(xe, e_rad)
-    dx, dy, dzz = (np.sum(d * v, -1) for v in (xe, e_rad, ze))
-    cosT = dx / re
-    sin2P = dzz ** 2 / np.maximum(dy ** 2 + dzz ** 2, 1e-12)
-    M = (sol.W / sol.air.c)[:, None]
-    Dh = (1 - cosT) * sin2P / ((1 + M * cosT) * (1 + 0.2 * M * cosT) ** 2)
-    return np.mean(Dh / re ** 2, axis=1)
+    out = 0.0
+    M = strips["U"] / air.c
+    for psi in 2 * np.pi * (np.arange(n_az) + 0.5) / n_az:
+        c, s = np.cos(psi), np.sin(psi)
+        Rz = np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
+        d = obs[None, :] - strips["pos"] @ Rz.T
+        xe, ye = strips["xe"] @ Rz.T, strips["ye"] @ Rz.T
+        ze = np.cross(xe, ye)
+        re = np.linalg.norm(d, axis=1)
+        dx, dy, dz = (np.sum(d * v, 1) for v in (xe, ye, ze))
+        cosT = dx / re
+        sin2P = dz ** 2 / np.maximum(dy ** 2 + dz ** 2, 1e-12)
+        out = out + (1 - cosT) * sin2P / ((1 + M * cosT) * (1 + 0.2 * M * cosT) ** 2) / re ** 2
+    return out / n_az
+
+
+def blade_strips(blade, sol):
+    """Strip description of a conventional blade + BEMT solution."""
+    n, th = len(blade.r), blade.twist
+    z = np.zeros(n)
+    return dict(pos=np.stack([blade.r, z, z], 1),
+                xe=np.stack([z, -np.cos(th), -np.sin(th)], 1),       # LE -> TE
+                ye=np.stack([z + 1, z, z], 1), chord=blade.chord, L=blade.dr, U=sol.W,
+                alpha=np.degrees(sol.alpha + 1.8 * blade.camber),
+                tip=(blade.chord[-1], sol.W[-1]))
+
+
+def ribbon_strips(rb, sol):
+    """Strip description of a ribbon blade + VLM solution.  A closed loop has
+    no free tip, so it gets no tip-vortex formation noise."""
+    g = rb.frames()
+    V = np.maximum(sol.W, 1.0)
+    return dict(pos=g["mid"] + 0.75 * rb.chord[:, None] * g["tcv"], xe=g["tcv"], ye=g["l"],
+                chord=rb.chord, L=g["len"], U=V,
+                alpha=np.degrees(sol.alpha + 1.8 * rb.camber),
+                tip=None if rb.closed_tip else (rb.chord[-1], V[-1]))
+
+
+def broadband_from_strips(strips, B, observers, air, freqs=THIRD_OCT, tripped=False, lbl=True):
+    """1/3-octave mean-square pressure [n_obs, n_f] plus per-mechanism split."""
+    parts = strip_self_noise(freqs, strips["chord"], strips["L"], strips["U"], strips["alpha"],
+                             air, tripped, lbl)
+    tip = None
+    if strips["tip"] is not None:
+        tip = tip_noise(freqs, strips["tip"][0], strips["tip"][1], strips["alpha"][-1], air)
+    total, split = [], {k: [] for k in list(parts) + ["tip"]}
+    for x in np.atleast_2d(observers):
+        w = B * _directivity(strips, x, air)
+        for k, v in parts.items():
+            split[k].append((v * w[:, None]).sum(0))
+        split["tip"].append(tip * w[-1] if tip is not None else 0 * freqs)
+        total.append(sum(split[k][-1] for k in split))
+    return np.array(total), {k: np.array(v) for k, v in split.items()}
 
 
 def broadband_noise(blade, sol, observers, air, freqs=THIRD_OCT, tripped=False, lbl=True):
-    """1/3-octave mean-square pressure [n_obs, n_f] plus per-mechanism split."""
-    a_eff = np.degrees(sol.alpha + 1.8 * blade.camber)
-    parts = strip_self_noise(freqs, blade.chord, blade.dr, sol.W, a_eff, air, tripped, lbl)
-    tip = tip_noise(freqs, blade.chord[-1], sol.W[-1], a_eff[-1], air)
-    total, split = [], {k: [] for k in list(parts) + ["tip"]}
-    for x in np.atleast_2d(observers):
-        w = blade.B * _directivity(blade, sol, x)
-        for k, v in parts.items():
-            split[k].append((v * w[:, None]).sum(0))
-        split["tip"].append(tip * w[-1])
-        total.append(sum(split[k][-1] for k in split))
-    return np.array(total), {k: np.array(v) for k, v in split.items()}
+    return broadband_from_strips(blade_strips(blade, sol), blade.B, observers, air, freqs, tripped, lbl)

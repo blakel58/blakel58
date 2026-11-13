@@ -67,3 +67,27 @@ def test_bpm_velocity_scaling_and_noise_trend():
     quiet = noise_report(b, solve_bemt(b, 8000))["dBA"]
     loud = noise_report(b, solve_bemt(b, 16000))["dBA"]
     assert loud > quiet + 8
+
+
+def test_vortex_lattice_agrees_with_blade_element():
+    from proplab.vlm import VlmRotor, ribbon_from_blade
+    b = standard_prop("5040", 3)
+    ref = solve_bemt(b, 15000)
+    v = VlmRotor(ribbon_from_blade(b)).converge(15000)
+    assert v.converged
+    assert abs(v.thrust / ref.thrust - 1) < 0.10
+    assert abs(v.power / ref.power - 1) < 0.20
+    assert v.figure_of_merit(b.R) < 0.85
+
+
+def test_loop_blade_lifts_on_both_arms():
+    from proplab.vlm import VlmRotor
+    from proplab.loop import loop_blade
+    rb = loop_blade(0.0635, 3, 50, 0.010, 0.7, [0.15, 0.22, 0.12, 0.22, 0.15],
+                    [26, 16, 9, 9, 16, 26])
+    s = VlmRotor(rb, revs=6).converge(9000)
+    n = len(rb.chord)
+    assert s.thrust > 0 and s.torque > 0
+    assert s.F[: n // 3, 2].sum() > 0 and s.F[-(n // 3):, 2].sum() > 0
+    # circulation reverses through the tip: it is carried round the loop
+    assert s.gamma[n // 4] > 0 > s.gamma[-(n // 4)]
